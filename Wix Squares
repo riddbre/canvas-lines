@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Lines</title>
+</head>
+<body>
+    <canvas id="lineCanvas" width="1500" height="1200" style="position: fixed; top: 0; left: 0; z-index: -1;"></canvas>
+
+    <script>
+        window.onload = function() {
+            var canvas = document.getElementById("lineCanvas");
+            var context = canvas.getContext("2d");
+
+            // Coordinates of the boxes
+            var boxes = [
+                { x: 210, y: 745 }, // Box 2
+                { x: 290, y: 869 }, // Box 3
+                { x: 125, y: 863 }, // Box 4
+                { x: 125, y: 636 }, // Box 5
+                { x: 397, y: 699 }, // Box 6
+                { x: 411, y: 819 }, // Box 7
+                { x: 251, y: 590 }, // Box 8
+                { x: 534, y: 881 }  // Box 9
+            ];
+
+            var currentIndex = 0;
+
+            // Function to draw a single line segment between two points
+            function drawLine(startX, startY, endX, endY) {
+                context.beginPath();
+                context.moveTo(startX, startY);
+                context.lineTo(endX, endY);
+                context.strokeStyle = '#000'; // Black color for the line
+                context.lineWidth = 2; // Line thickness
+                context.stroke();
+            }
+
+            // Function to animate the line drawing between boxes
+            function animateLineDrawing() {
+                if (currentIndex < boxes.length - 1) {
+                    var startBox = boxes[currentIndex];
+                    var endBox = boxes[currentIndex + 1];
+                    
+                    var stepCount = 0;
+                    var steps = 100;
+
+                    var xDiff = (endBox.x - startBox.x) / steps;
+                    var yDiff = (endBox.y - startBox.y) / steps;
+
+                    function drawStep() {
+                        if (stepCount <= steps) {
+                            var currentX = startBox.x + xDiff * stepCount;
+                            var currentY = startBox.y + yDiff * stepCount;
+
+                            context.clearRect(0, 0, canvas.width, canvas.height);
+                            for (var i = 0; i <= currentIndex; i++) {
+                                var prevBox = boxes[i];
+                                var nextBox = boxes[i + 1];
+                                if (nextBox) {
+                                    drawLine(prevBox.x, prevBox.y, nextBox.x, nextBox.y);
+                                }
+                            }
+
+                            drawLine(startBox.x, startBox.y, currentX, currentY);
+                            stepCount++;
+                            requestAnimationFrame(drawStep);
+                        } else {
+                            currentIndex++;
+                            animateLineDrawing();
+                        }
+                    }
+
+                    drawStep();
+                }
+            }
+
+            // Start the line animation
+            animateLineDrawing();
+        };
+    </script>
+</body>
+</html>
+
